@@ -1,3 +1,5 @@
+import random
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from rest_framework.exceptions import ValidationError
@@ -12,11 +14,13 @@ class Actor(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+
 class Genre(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
+
 
 class Play(models.Model):
     title = models.CharField(max_length=100)
@@ -32,6 +36,7 @@ class Play(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class TheatreHall(models.Model):
     name = models.CharField(max_length=100)
@@ -55,19 +60,15 @@ class Performance(models.Model):
     )
     show_time = models.DateTimeField()
 
+    @property
+    def available_seats(self):
+        total_tickets = Performance.objects.prefetch_related("tickets").count()
+        seats_total = self.theatre_hall.seats_in_row * self.theatre_hall.rows
+        return seats_total - total_tickets
+
     def __str__(self):
         return f"{self.theatre_hall.name} - {self.play.title}"
 
-class Reservation(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    user =  models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='reservations'
-    )
-
-    def __str__(self):
-        return f"Reservation for {self.user.username}"
 
 class Ticket(models.Model):
     row = models.IntegerField()
@@ -80,20 +81,12 @@ class Ticket(models.Model):
         null=True,
         blank=True,
     )
-    reservation = models.ForeignKey(
-        Reservation,
-        on_delete=models.CASCADE,
-        related_name='tickets',
-        null=True,
-        blank=True,
-
-    )
 
     class Meta:
         unique_together = ('row', 'seat')
 
     @staticmethod
-    def validate_seat_and_row(seat: int, seats_in_row: int, row: int, rows: int, error_to_raise,):
+    def validate_seat_and_row(seat: int, seats_in_row: int, row: int, rows: int, error_to_raise, ):
         if not (1 <= seat <= seats_in_row):
             raise error_to_raise({
                 "seat": f"seat must be in the range [1, {seats_in_row}]"
@@ -112,6 +105,36 @@ class Ticket(models.Model):
             ValidationError
         )
 
+
+    def __str__(self):
+        return (
+            f"Performance #{self.performance.id} "
+            f" Play: {self.performance.play.title} "
+            f" Row: {self.row} "
+            f" Seat: {self.seat} "
+            f"Show time {self.performance.show_time}"
+        )
+
+
+class Reservation(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reservations'
+    )
+
+    ticket = models.ForeignKey(
+        Ticket,
+        on_delete=models.CASCADE,
+        related_name="reservations",
+        null=True,
+    )
+    class Meta:
+        unique_together = ('user', 'ticket')
+
+    def __str__(self):
+        return f"Reservation for {self.user.username}"
 
 
 class User(AbstractUser):
