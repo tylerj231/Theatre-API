@@ -7,7 +7,7 @@ from core.models import (
     TheatreHall,
     Reservation,
     Actor,
-    Genre
+    Genre,
 )
 
 admin.site.register(Performance)

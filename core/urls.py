@@ -8,7 +8,7 @@ from core.views import (
     ReservationViewSet,
     ActorViewSet,
     GenreViewSet,
-    PerformanceViewSet
+    PerformanceViewSet,
 
 )
 

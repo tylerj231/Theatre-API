@@ -1,8 +1,14 @@
-from django.db import transaction
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-
-from core.models import Play, Actor, Genre, Performance, TheatreHall, Ticket, Reservation
+from core.models import (
+    Play,
+    Actor,
+    Genre,
+    Performance,
+    TheatreHall,
+    Ticket,
+    Reservation
+)
 
 
 class PlaySerializer(serializers.ModelSerializer):
@@ -61,12 +67,18 @@ class PerformanceSerializer(serializers.ModelSerializer):
 
 
 class PerformanceListSerializer(PerformanceSerializer):
-    theatre_hall = serializers.CharField(source="theatre_hall.name")
-    play = serializers.CharField(source="play.title", read_only=True)
+    theatre_hall = serializers.CharField(
+        source="theatre_hall.name"
+    )
+
+    play = serializers.CharField(
+        source="play.title",
+        read_only=True
+    )
 
     class Meta:
         model = Performance
-        fields = PerformanceSerializer.Meta.fields + ("play", "available_seats")
+        fields = PerformanceSerializer.Meta.fields + ("play",)
 
 
 class PlayRetrieveSerializer(PlaySerializer):
@@ -101,12 +113,6 @@ class TheatreHallSerializer(serializers.ModelSerializer):
         )
 
 
-class TheatreHallListSerializer(TheatreHallSerializer):
-    class Meta:
-        model = TheatreHall
-        fields = TheatreHallSerializer.Meta.fields
-
-
 class TheatreHallRetrieveSerializer(TheatreHallSerializer):
     class Meta:
         model = TheatreHall
@@ -114,21 +120,16 @@ class TheatreHallRetrieveSerializer(TheatreHallSerializer):
 
 
 class PerformanceRetrieveSerializer(PerformanceSerializer):
-    theatre_hall = TheatreHallRetrieveSerializer(read_only=True)
-    play = serializers.CharField(source="play.title", read_only=True)
-
-
-
-class ReservationTicketSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Reservation
-        fields = (
-            "id"
-        )
+    theatre_hall = TheatreHallRetrieveSerializer(
+        read_only=True
+    )
+    play = serializers.CharField(
+        source="play.title",
+        read_only=True
+    )
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    reservations = ReservationTicketSerializer(many=True, read_only=True)
     class Meta:
         model = Ticket
         fields = (
@@ -136,7 +137,6 @@ class TicketSerializer(serializers.ModelSerializer):
             "row",
             "seat",
             "performance",
-            "reservations",
         )
 
     def validate(self, attrs):
@@ -167,6 +167,11 @@ class TicketRetrieveSerializer(TicketSerializer):
 
 
 class ReservationSerializer(serializers.ModelSerializer):
+    ticket = serializers.PrimaryKeyRelatedField(
+        queryset=Ticket.objects.filter(reservations__isnull=True),
+        label="Available Tickets"
+    )
+
     class Meta:
         model = Reservation
         fields = (
@@ -176,16 +181,15 @@ class ReservationSerializer(serializers.ModelSerializer):
         )
         validators = [
             UniqueTogetherValidator(
-                queryset = Reservation.objects.all().select_related("ticket"),
-                fields = ("ticket",),
-                message = "This reservation already exists."
+                queryset=Reservation.objects.all().select_related("ticket"),
+                fields=("ticket",),
+                message="The reservation for this ticket already exists."
             )
         ]
 
+
 class ReservationListSerializer(ReservationSerializer):
-    ticket = serializers.StringRelatedField(
-        read_only=True
-    )
+    pass
 
 
 class ReservationRetrieveSerializer(ReservationSerializer):
