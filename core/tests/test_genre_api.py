@@ -38,12 +38,12 @@ class AuthenticatedUserTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_genre_delete_forbidden(self):
-       genre = Genre.objects.create(
-           name="Test Genre",
-       )
-       url = reverse("core:genre-detail", kwargs={"pk": genre.id})
-       response = self.client.delete(url)
-       self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        genre = Genre.objects.create(
+            name="Test Genre",
+        )
+        url = reverse("core:genre-detail", kwargs={"pk": genre.id})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_admin_create_genre_allow(self):
         self.user.is_staff = True

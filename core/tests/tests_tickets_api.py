@@ -5,8 +5,11 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from core.models import Ticket
-from core.serializers import TicketListSerializer, TicketRetrieveSerializer
-from core.tests.tests import create_sample_performance
+from core.serializers import (
+    TicketListSerializer,
+    TicketRetrieveSerializer
+)
+from core.config_for_tests import create_sample_performance
 
 
 class AuthenticatedUserTest(TestCase):
@@ -52,7 +55,6 @@ class AuthenticatedUserTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
-
 
     def test_ticket_create_forbidden(self):
         payload = {

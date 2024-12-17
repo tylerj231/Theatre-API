@@ -7,9 +7,16 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Performance, TheatreHall
-from core.serializers import PerformanceListSerializer, PerformanceRetrieveSerializer
-from core.tests.tests import create_sample_performance, create_sample_plays, create_sample_theatre
+from core.models import Performance
+from core.serializers import (
+    PerformanceListSerializer,
+    PerformanceRetrieveSerializer
+)
+from core.config_for_tests import (
+    create_sample_plays,
+    create_sample_theatre,
+    create_sample_performance
+)
 
 
 class AuthenticatedUserTest(TestCase):
@@ -21,21 +28,18 @@ class AuthenticatedUserTest(TestCase):
         )
         self.client.force_authenticate(self.user)
 
-
     def test_performance_list(self):
         create_sample_performance()
         url = reverse("core:performance-list")
         response = self.client.get(url)
         performances = Performance.objects.prefetch_related(
-                "play",
-                "theatre_hall",
-                "tickets",
-            ).annotate(
-                available_seats=F("theatre_hall__rows")
-                                * F("theatre_hall__seats_in_row")
-                                - Count("tickets__reservations")
-
-            )
+            "play",
+            "theatre_hall",
+            "tickets",
+        ).annotate(
+            available_seats=F("theatre_hall__rows") * F("theatre_hall__seats_in_row")
+                            - Count("tickets__reservations")
+        )
         serializer = PerformanceListSerializer(performances, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
@@ -55,8 +59,8 @@ class AuthenticatedUserTest(TestCase):
         theatre = create_sample_theatre()
         payload = {
             "play": play.id,
-            "theatre_hall":theatre.id,
-            "show_time": datetime.now()
+            "theatre_hall": theatre.id,
+            "show_time": datetime.now(),
         }
         url = reverse("core:performance-list")
         response = self.client.post(url, payload)
@@ -76,7 +80,7 @@ class AuthenticatedUserTest(TestCase):
         payload = {
             "play": play.id,
             "theatre_hall": theatre_hall.id,
-            "show_time":datetime.now()
+            "show_time": datetime.now(),
         }
         url = reverse("core:performance-list")
         response = self.client.post(url, payload)

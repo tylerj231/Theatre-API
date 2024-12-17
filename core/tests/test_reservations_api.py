@@ -87,7 +87,6 @@ class AuthenticatedUserTest(TestCase):
         ticket = Ticket.objects.create(
             row=1,
             seat=1,
-
         )
         reservation = Reservation.objects.create(
             created_at=datetime.now(),

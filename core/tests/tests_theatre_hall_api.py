@@ -38,10 +38,7 @@ class AuthenticatedUserTest(TestCase):
             name="Test Theatre Hall",
         )
 
-        url = reverse(
-            "core:theatrehall-detail",
-            kwargs={"pk": 1}
-        )
+        url = reverse("core:theatrehall-detail", kwargs={"pk": 1})
 
         response = self.client.get(url)
 
@@ -60,7 +57,7 @@ class AuthenticatedUserTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_theatre_hall_delete_forbidden(self):
-        theatre_hall =  TheatreHall.objects.create(
+        theatre_hall = TheatreHall.objects.create(
             name="Test Theatre Hall",
         )
         url = reverse("core:theatrehall-detail", kwargs={"pk": theatre_hall.id})

@@ -6,10 +6,11 @@ from rest_framework.test import APIClient
 
 from core.models import Play, Actor, Genre
 from core.serializers import PlayListSerializer, PlayRetrieveSerializer
-from .tests import create_sample_plays, create_sample_performance
+from core.config_for_tests import create_sample_plays
 
 BASE_URL = reverse("core:play-list")
 DETAIL_URL = reverse("core:play-detail", kwargs={"pk": 1})
+
 
 class AuthenticatedUserTest(TestCase):
     def setUp(self):

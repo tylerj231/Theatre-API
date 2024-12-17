@@ -1,5 +1,3 @@
-from django.contrib.auth.models import AbstractUser
-
 from django.core.validators import MinValueValidator
 
 from django.db import models
@@ -21,7 +19,7 @@ class Actor(models.Model):
         unique=True
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"
 
 
@@ -31,7 +29,7 @@ class Genre(models.Model):
         unique=True
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -48,7 +46,7 @@ class Play(models.Model):
         related_name="plays",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
 
@@ -64,7 +62,7 @@ class TheatreHall(models.Model):
         validators=[MinValueValidator(1)]
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -83,7 +81,7 @@ class Performance(models.Model):
 
     show_time = models.DateTimeField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.theatre_hall.name} - {self.play.title}"
 
 
@@ -94,30 +92,28 @@ class Ticket(models.Model):
     performance = models.ForeignKey(
         Performance,
         on_delete=models.CASCADE,
-        related_name='tickets',
+        related_name="tickets",
         null=True,
         blank=True,
     )
 
     class Meta:
-        unique_together = ('row', 'seat')
+        unique_together = ("row", "seat")
 
     @staticmethod
     def validate_seat_and_row(
-            seat: int,
-            seats_in_row: int,
-            row: int,
-            rows: int,
-            error_to_raise,
+        seat: int,
+        seats_in_row: int,
+        row: int,
+        rows: int,
+        error_to_raise,
     ):
         if not (1 <= seat <= seats_in_row):
-            raise error_to_raise({
-                "seat": f"seat must be in the range [1, {seats_in_row}]"
-            })
+            raise error_to_raise(
+                {"seat": f"seat must be in the range [1, {seats_in_row}]"}
+            )
         elif not (1 <= row <= rows):
-            raise error_to_raise({
-                "row": f"row must be in the range [1, {rows}]"
-            })
+            raise error_to_raise({"row": f"row must be in the range [1, {rows}]"})
 
     def clean(self):
         Ticket.validate_seat_and_row(
@@ -125,7 +121,7 @@ class Ticket(models.Model):
             self.performance.theatre_hall.seats_in_row,
             self.row,
             self.performance.theatre_hall.rows,
-            ValidationError
+            ValidationError,
         )
 
     def __str__(self):
@@ -139,9 +135,7 @@ class Ticket(models.Model):
 
 
 class Reservation(models.Model):
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -158,10 +152,10 @@ class Reservation(models.Model):
     class Meta:
         constraints = [
             UniqueConstraint(
-                fields=['user', 'ticket'],
+                fields=["user", "ticket"],
                 name="unique_ticket_for_reservation"
             )
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Reservation for {self.user.username}"

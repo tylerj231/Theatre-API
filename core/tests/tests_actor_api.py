@@ -6,7 +6,7 @@ from rest_framework.test import APIClient
 
 from core.models import Actor
 from core.serializers import ActorListSerializer, ActorSerializer
-from core.tests.tests import create_sample_plays
+from core.config_for_tests import create_sample_plays
 
 
 class AuthenticatedUserTest(TestCase):
@@ -17,7 +17,6 @@ class AuthenticatedUserTest(TestCase):
             password="test-1-2-3",
         )
         self.client.force_authenticate(self.user)
-
 
     def test_actor_list(self):
         actor_1 = Actor.objects.create(

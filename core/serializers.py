@@ -7,8 +7,9 @@ from core.models import (
     Performance,
     TheatreHall,
     Ticket,
-    Reservation
+    Reservation,
 )
+
 
 class PlaySerializer(serializers.ModelSerializer):
     class Meta:
@@ -122,9 +123,7 @@ class TheatreHallRetrieveSerializer(TheatreHallSerializer):
 
 
 class PerformanceRetrieveSerializer(PerformanceSerializer):
-    theatre_hall = TheatreHallRetrieveSerializer(
-        read_only=True
-    )
+    theatre_hall = TheatreHallRetrieveSerializer(read_only=True)
     play = serializers.CharField(
         source="play.title",
         read_only=True
@@ -148,7 +147,7 @@ class TicketSerializer(serializers.ModelSerializer):
             attrs["performance"].theatre_hall.seats_in_row,
             attrs["row"],
             attrs["performance"].theatre_hall.rows,
-            serializers.ValidationError
+            serializers.ValidationError,
         )
         return data
 
@@ -171,7 +170,7 @@ class TicketRetrieveSerializer(TicketSerializer):
 class ReservationSerializer(serializers.ModelSerializer):
     ticket = serializers.PrimaryKeyRelatedField(
         queryset=Ticket.objects.filter(reservations__isnull=True),
-        label="Available Tickets"
+        label="Available Tickets",
     )
 
     class Meta:
@@ -185,7 +184,7 @@ class ReservationSerializer(serializers.ModelSerializer):
             UniqueTogetherValidator(
                 queryset=Reservation.objects.all().select_related("ticket"),
                 fields=("ticket",),
-                message="The reservation for this ticket already exists."
+                message="The reservation for this ticket already exists.",
             )
         ]
 

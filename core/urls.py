@@ -9,10 +9,9 @@ from core.views import (
     ActorViewSet,
     GenreViewSet,
     PerformanceViewSet,
-
 )
 
-app_name = 'core'
+app_name = "core"
 
 router = routers.DefaultRouter()
 router.register("plays", PlayViewSet)
@@ -25,5 +24,4 @@ router.register("performances", PerformanceViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
-
 ]
