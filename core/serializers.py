@@ -62,7 +62,7 @@ class PerformanceSerializer(serializers.ModelSerializer):
             "id",
             "play",
             "show_time",
-            "theatre_hall"
+            "theatre_hall",
         )
 
 
@@ -75,10 +75,13 @@ class PerformanceListSerializer(PerformanceSerializer):
         source="play.title",
         read_only=True
     )
+    available_seats = serializers.IntegerField(
+        read_only=True,
+    )
 
     class Meta:
         model = Performance
-        fields = PerformanceSerializer.Meta.fields + ("play",)
+        fields = PerformanceSerializer.Meta.fields + ("play", "available_seats")
 
 
 class PlayRetrieveSerializer(PlaySerializer):

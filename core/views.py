@@ -1,3 +1,4 @@
+from django.db.models import Count, F
 from rest_framework import viewsets
 
 from core.models import (
@@ -49,18 +50,28 @@ class PerformanceViewSet(viewsets.ModelViewSet):
         return PerformanceSerializer
 
     def get_queryset(self):
-        queryset = self.queryset.select_related("play", "theatre_hall")
+        queryset = self.queryset
 
         if self.action == 'list':
-            play = self.request.query_params.get('play', None)
-            date = self.request.query_params.get('date', None)
+            queryset = queryset.prefetch_related(
+                "play",
+                "theatre_hall",
+                "tickets",
+            ).annotate(
+                available_seats=F("theatre_hall__rows")
+                                * F("theatre_hall__seats_in_row")
+                                - Count("tickets__reservations")
 
-            if play:
-                play_ids = [int(str_id) for str_id in play.split(',')]
-                queryset = queryset.filter(play_id__in=play_ids)
+            )
+        play = self.request.query_params.get('play', None)
+        date = self.request.query_params.get('date', None)
 
-            if date:
-                queryset = queryset.filter(show_time__date=date)
+        if play:
+            play_ids = [int(str_id) for str_id in play.split(',')]
+            queryset = queryset.filter(play_id__in=play_ids)
+
+        if date:
+            queryset = queryset.filter(show_time__date=date)
 
         return queryset.distinct()
 
@@ -91,7 +102,7 @@ class TheatreHallViewSet(viewsets.ModelViewSet):
 
 
 class ActorViewSet(viewsets.ModelViewSet):
-    queryset = Actor.objects.all()
+    queryset = Actor.objects.prefetch_related("plays")
     serializer_class = ActorSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly]
 
@@ -108,10 +119,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 
 class TicketViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.prefetch_related(
-        "performance",
-        "reservations"
-    )
+    queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly]
 
@@ -124,7 +132,8 @@ class TicketViewSet(viewsets.ModelViewSet):
         return TicketSerializer
 
     def get_queryset(self):
-        queryset = Ticket.objects.exclude(reservations__isnull=False)
+        queryset = Ticket.objects.prefetch_related("reservations", "performance")
+        queryset = queryset.exclude(reservations__isnull=False)
 
         return queryset.distinct()
 

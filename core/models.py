@@ -83,12 +83,6 @@ class Performance(models.Model):
 
     show_time = models.DateTimeField()
 
-    # @property
-    # def available_seats(self):
-    #     total_tickets = Performance.objects.prefetch_related("tickets").count()
-    #     seats_total = self.theatre_hall.seats_in_row * self.theatre_hall.rows
-    #     return seats_total - total_tickets
-
     def __str__(self):
         return f"{self.theatre_hall.name} - {self.play.title}"
 
