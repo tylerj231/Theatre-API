@@ -1,4 +1,5 @@
 from django.db.models import Count, F
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets
 
 from core.models import (
@@ -74,6 +75,24 @@ class PerformanceViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(show_time__date=date)
 
         return queryset.distinct()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "play",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter performance by play id, Example:(?play=1,2)",
+            ),
+            OpenApiParameter(
+                "date",
+                type={"type":"string"},
+                description="Filter performance by date, Example:(?date=2024-12-20)",
+
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class PlayViewSet(viewsets.ModelViewSet):

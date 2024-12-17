@@ -10,7 +10,6 @@ from core.models import (
     Reservation
 )
 
-
 class PlaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Play
