@@ -35,14 +35,13 @@ class AuthenticatedUserTest(TestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_actor_retrieve(self):
-        Actor.objects.create(
+        actor = Actor.objects.create(
             first_name="Jason",
             last_name="Statham",
         )
 
-        url = reverse("core:actor-detail", kwargs={"pk": 1})
+        url = reverse("core:actor-detail", args=[actor.id])
         response = self.client.get(url)
-        actor = Actor.objects.get(pk=response.data["id"])
 
         serializer = ActorSerializer(actor)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

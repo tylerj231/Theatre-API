@@ -40,16 +40,14 @@ class AuthenticatedUserTest(TestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_ticket_detail(self):
-        Ticket.objects.create(
+        ticket = Ticket.objects.create(
             row=1,
             seat=1,
             performance=create_sample_performance(),
         )
-        url = reverse("core:ticket-detail", kwargs={"pk": 1})
+        url = reverse("core:ticket-detail", args=[ticket.id])
 
         response = self.client.get(url)
-
-        ticket = Ticket.objects.get(pk=response.data["id"])
 
         serializer = TicketRetrieveSerializer(ticket)
 

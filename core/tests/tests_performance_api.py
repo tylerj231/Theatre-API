@@ -45,12 +45,11 @@ class AuthenticatedUserTest(TestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_performance_detail(self):
-        create_sample_performance()
-        url = reverse("core:performance-detail", kwargs={"pk": 1})
+        performance = create_sample_performance()
+        url = reverse("core:performance-detail", args=[performance.id])
         response = self.client.get(url)
-        performance = Performance.objects.get(pk=response.data["id"])
-
         serializer = PerformanceRetrieveSerializer(performance)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
 

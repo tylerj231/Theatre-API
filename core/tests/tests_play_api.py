@@ -9,8 +9,6 @@ from core.serializers import PlayListSerializer, PlayRetrieveSerializer
 from core.config_for_tests import create_sample_plays
 
 BASE_URL = reverse("core:play-list")
-DETAIL_URL = reverse("core:play-detail", kwargs={"pk": 1})
-
 
 class AuthenticatedUserTest(TestCase):
     def setUp(self):
@@ -21,19 +19,24 @@ class AuthenticatedUserTest(TestCase):
         )
         self.client.force_authenticate(self.user)
 
-    def test_authenticated_user(self):
-        response = self.client.get(BASE_URL)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
     def test_play_list(self):
         create_sample_plays()
         response = self.client.get(BASE_URL)
 
         plays = Play.objects.all()
-        serializer = PlayListSerializer(plays, many=True)
+        serializer = PlayListSerializer(
+            plays,
+            many=True
+        )
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+        self.assertEqual(
+            response.data,
+            serializer.data
+        )
 
     def test_play_retrieve(self):
         play_with_genre_and_actor = create_sample_plays()
@@ -49,28 +52,52 @@ class AuthenticatedUserTest(TestCase):
         play_with_genre_and_actor.genres.add(genre)
         play_with_genre_and_actor.actors.add(actor)
 
-        response = self.client.get(DETAIL_URL)
+        url =  reverse(
+            "core:play-detail",
+            args=[play_with_genre_and_actor.id]
+        )
+        response = self.client.get(url)
 
-        play = Play.objects.get(pk=play_with_genre_and_actor.pk)
+        serializer = PlayRetrieveSerializer(
+            play_with_genre_and_actor,
+            many=False
+        )
 
-        serializer = PlayRetrieveSerializer(play, many=False)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+        self.assertEqual(
+            response.data,
+            serializer.data
+        )
 
     def test_play_create_forbidden(self):
         payload = {
             "title": "test play",
             "description": "test play",
         }
-        response = self.client.post(BASE_URL, payload)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        response = self.client.post(
+            BASE_URL,
+            payload
+        )
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN
+        )
 
     def test_play_delete_forbidden(self):
         play = create_sample_plays()
-        url = reverse("core:play-detail", kwargs={"pk": play.pk})
+        url = reverse(
+            "core:play-detail",
+            kwargs={"pk": play.pk}
+        )
         response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN
+        )
 
     def test_admin_play_create_allow(self):
         self.user.is_staff = True
@@ -78,13 +105,25 @@ class AuthenticatedUserTest(TestCase):
             "title": "test play",
             "description": "test play",
         }
+
         url = reverse("core:play-list")
+
         response = self.client.post(url, payload)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED
+        )
 
     def test_admin_play_delete_allow(self):
         self.user.is_staff = True
         play = create_sample_plays()
-        url = reverse("core:play-detail", kwargs={"pk": play.pk})
+        url = reverse(
+            "core:play-detail",
+            kwargs={"pk": play.pk}
+        )
         response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_204_NO_CONTENT
+        )
