@@ -52,15 +52,15 @@ API service for booking tickets online for various performances in a Theatre.
 
 ## Models diagram
 
-![Models Diagram](/images/db_structure.png)
+![Models Diagram](images/db_structure.png)
 
 ****
 
 ## Screenshots
 
-![Genres](/images/Genre list.png)
-![Actors](/images/Actor list.png)
-![Tickets](/Images/Tickets List.png)
-![Theatre Halls](/images/Theatre Hall List.png)
-![Reservations](/images/Reservation List.png)
-![Performances](/images/Performance List.png)
+![Genres](images/Genre_list.png)
+![Actors](images/Actor_list.png)
+![Tickets](images/Tickets_List.png)
+![Theatre Halls](images/Theatre_Hall_List.png)
+![Reservations](images/Reservation_List.png)
+![Performances](images/Performance_List.png)
