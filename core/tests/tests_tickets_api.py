@@ -9,7 +9,7 @@ from core.serializers import (
     TicketListSerializer,
     TicketRetrieveSerializer
 )
-from core.config_for_tests import create_sample_performance
+from core.tests.config_for_tests import create_sample_performance
 
 
 class AuthenticatedUserTest(TestCase):

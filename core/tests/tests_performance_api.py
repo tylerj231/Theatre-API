@@ -12,7 +12,7 @@ from core.serializers import (
     PerformanceListSerializer,
     PerformanceRetrieveSerializer
 )
-from core.config_for_tests import (
+from core.tests.config_for_tests import (
     create_sample_plays,
     create_sample_theatre,
     create_sample_performance

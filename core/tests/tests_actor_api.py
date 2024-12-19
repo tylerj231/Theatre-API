@@ -6,7 +6,7 @@ from rest_framework.test import APIClient
 
 from core.models import Actor
 from core.serializers import ActorListSerializer, ActorSerializer
-from core.config_for_tests import create_sample_plays
+from core.tests.config_for_tests import create_sample_plays
 
 
 class AuthenticatedUserTest(TestCase):

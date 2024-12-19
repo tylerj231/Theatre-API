@@ -1,0 +1,8 @@
+.env
+.idea
+.DS_Store
+venv/
+.pytest_cache/
+**__pycache__/
+docker-compose.yaml
+Dockerfile

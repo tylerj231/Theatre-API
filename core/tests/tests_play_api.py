@@ -6,7 +6,7 @@ from rest_framework.test import APIClient
 
 from core.models import Play, Actor, Genre
 from core.serializers import PlayListSerializer, PlayRetrieveSerializer
-from core.config_for_tests import create_sample_plays
+from core.tests.config_for_tests import create_sample_plays
 
 BASE_URL = reverse("core:play-list")
 
