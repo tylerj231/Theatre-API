@@ -48,13 +48,12 @@ API service for booking tickets online for various performances in a Theatre.
 - Filtering performances by particular play and/or date.
 
 ## Demo
-****
 
-## Models diagram
+### Models diagram
 
 ![Models Diagram](images/db_structure.png)
 
-****
+
 
 ## Screenshots
 
